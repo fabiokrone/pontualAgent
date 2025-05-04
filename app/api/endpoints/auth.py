@@ -236,81 +236,87 @@ async def redefinir_senha(
     """
     Redefine a senha do usuário usando o token recebido.
     """
-    # Adicionar logs completos sem mascarar o token
-    print(f"DEBUG - Token recebido do frontend: '{request_data.token}'")
-    print(f"DEBUG - Comprimento do token: {len(request_data.token)}")
-    logger.info(f"Tentativa de redefinição de senha")
-    logger.debug(f"Token completo recebido: '{request_data.token}'")
-    logger.debug(f"Comprimento do token: {len(request_data.token)}")
+    # Validar token
+    if not request_data.token:
+        logger.warning("Token não fornecido na requisição")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Token inválido ou expirado."
+        )
     
-    # Verificar se o token contém caracteres especiais
-    special_chars = ['+', '/', '_', '=', '-']
-    found_special_chars = [char for char in special_chars if char in request_data.token]
-    if found_special_chars:
-        print(f"DEBUG - O token recebido contém caracteres especiais: {found_special_chars}")
-        logger.debug(f"O token recebido contém os caracteres especiais: {found_special_chars}")
+    # Limpar e validar o token
+    token_recebido = request_data.token.strip()
+    logger.info(f"Tentativa de redefinição de senha com token de {len(token_recebido)} caracteres")
     
-    # Buscar todos os tokens ativos no banco para comparação
-    tokens_ativos = db.query(Usuario.id, Usuario.username, Usuario.reset_token).filter(
-        Usuario.reset_token.isnot(None)
-    ).all()
-    
-    print(f"DEBUG - Número de tokens ativos: {len(tokens_ativos)}")
-    logger.debug(f"Tokens ativos encontrados no banco: {len(tokens_ativos)}")
-    
-    for user_id, username, db_token in tokens_ativos:
-        print(f"DEBUG - Usuário: {username}, Token no banco: '{db_token}'")
-        logger.debug(f"ID: {user_id}, Usuário: {username}")
-        logger.debug(f"Token no banco: '{db_token}'")
-        
-        # Verificar exatamente o que é diferente entre os tokens
-        if db_token and request_data.token:
-            igual = db_token == request_data.token
-            print(f"DEBUG - Tokens iguais? {igual}")
-            logger.debug(f"Tokens são iguais? {igual}")
-            
-            if not igual:
-                # Se os tokens não são iguais, verificar onde estão as diferenças
-                diferentes = [(i, request_data.token[i], db_token[i]) 
-                            for i in range(min(len(request_data.token), len(db_token))) 
-                            if request_data.token[i] != db_token[i]]
-                print(f"DEBUG - Diferenças encontradas: {diferentes}")
-                logger.debug(f"Diferenças encontradas: {diferentes}")
-                
-                # Verificar se há diferença de comprimento
-                if len(request_data.token) != len(db_token):
-                    print(f"DEBUG - Diferença de comprimento: frontend={len(request_data.token)}, banco={len(db_token)}")
-                    logger.debug(f"Diferença de comprimento: token do frontend={len(request_data.token)}, token do banco={len(db_token)}")
-    
-    # Buscar usuário pelo token exato como recebido do frontend
-    usuario = db.query(Usuario).filter(Usuario.reset_token == request_data.token).first()
+    # Buscar usuário pelo token
+    usuario = db.query(Usuario).filter(Usuario.reset_token == token_recebido).first()
 
-    # Verificar se o usuário existe e se o token é válido e não expirou
     if not usuario:
-        logger.warning("Token não encontrado no banco de dados")
+        logger.warning(f"Token não encontrado no banco de dados")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Token inválido ou expirado."
         )
         
-    if not usuario.reset_token_expires_at or usuario.reset_token_expires_at < datetime.now(timezone.utc):
-        logger.warning(f"Token expirado para usuário {usuario.username}. Expirou em: {usuario.reset_token_expires_at}")
+    # Verificar expiração do token
+    agora = datetime.now(timezone.utc)
+    
+    # Verificação segura da data de expiração com tratamento para diferentes tipos de fuso horário
+    if not usuario.reset_token_expires_at:
+        token_expirado = True
+    else:
+        # Verificar se reset_token_expires_at já tem fuso horário
+        if usuario.reset_token_expires_at.tzinfo is None:
+            # Se não tiver, assumir UTC para comparação segura
+            token_expires_aware = usuario.reset_token_expires_at.replace(tzinfo=timezone.utc)
+        else:
+            # Se já tiver fuso horário, usar como está
+            token_expires_aware = usuario.reset_token_expires_at
+            
+        token_expirado = token_expires_aware < agora
+    
+    if token_expirado:
+        logger.warning(f"Token expirado para usuário {usuario.username}")
+        
         # Limpar token expirado
         usuario.reset_token = None
         usuario.reset_token_expires_at = None
         db.commit()
+        
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Token inválido ou expirado."
         )
 
-    # Redefinir a senha
-    logger.debug(f"Token válido para usuário {usuario.username}. Redefinindo senha.")
-    usuario.senha_hash = obter_hash_senha(request_data.nova_senha)
-    # Invalidar o token após o uso
-    usuario.reset_token = None
-    usuario.reset_token_expires_at = None
-    db.commit()
-    logger.info(f"Senha redefinida com sucesso para o usuário {usuario.username}")
+    # Validar a nova senha
+    if request_data.nova_senha != request_data.confirmacao_nova_senha:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A nova senha e a confirmação não coincidem."
+        )
+    
+    if len(request_data.nova_senha) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A nova senha deve ter pelo menos 8 caracteres."
+        )
 
-    return {"message": "Senha redefinida com sucesso."}
+    # Redefinir a senha
+    try:
+        # Atualizar senha
+        usuario.senha_hash = obter_hash_senha(request_data.nova_senha)
+        usuario.reset_token = None
+        usuario.reset_token_expires_at = None
+        
+        db.commit()
+        logger.info(f"Senha redefinida com sucesso para o usuário {usuario.username}")
+        
+        return {"message": "Senha redefinida com sucesso! Você já pode fazer login com sua nova senha."}
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Erro ao redefinir senha: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Ocorreu um erro ao redefinir sua senha. Tente novamente mais tarde."
+        )

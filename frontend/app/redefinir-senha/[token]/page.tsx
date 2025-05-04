@@ -15,20 +15,15 @@ export default function ResetPasswordPage() {
   const params = useParams();
   const router = useRouter();
 
-  // Extract token from URL parameters on component mount
-  console.log("Token original da URL:", params?.token);
+  // Extrair token da URL corretamente
   useEffect(() => {
+    // O token vem como um parâmetro dinâmico da rota
     if (params?.token) {
-      // Ensure token is treated as a string
-      const urlToken = Array.isArray(params.token) ? params.token[0] : params.token;
-      
-      // Decodificar o token da URL usando o mesmo método que é compatível com quote do backend
-      const decodedToken = decodeURIComponent(urlToken);
+      const urlToken = Array.isArray(params.token) ? params.token[0] : String(params.token);
       console.log("Token da URL:", urlToken);
-      console.log("Token decodificado:", decodedToken);
       
-      // Usar o token decodificado para o estado
-      setToken(decodedToken);
+      // Usar o token como está, sem qualquer decodificação adicional
+      setToken(urlToken);
     } else {
       setError('Token de redefinição não encontrado na URL.');
       console.error('Token não encontrado nos parâmetros da URL:', params);
@@ -59,26 +54,16 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    // Password strength validation (example: minimum 8 characters)
     if (password.length < 8) {
       setError('A nova senha deve ter pelo menos 8 caracteres.');
       setIsLoading(false);
       return;
     }
-
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (!apiUrl) {
-      console.error("Erro Crítico: A variável de ambiente NEXT_PUBLIC_API_URL não está definida!");
-      setError("Erro de configuração do sistema. Contate o administrador.");
-      setIsLoading(false);
-      return;
-    }
-
-    const resetUrl = `${apiUrl}/auth/reset-password`;
+    const resetUrl = `/api/auth/reset-password`;
+    
     console.log(`Enviando requisição de redefinição para: ${resetUrl}`);
 
     try {
-      // Preparar e logar o corpo da requisição
       const requestBody = { 
         token: token, 
         nova_senha: password, 
@@ -102,10 +87,9 @@ export default function ResetPasswordPage() {
         setError(data?.detail || 'Ocorreu um erro ao redefinir sua senha. O link pode ter expirado ou ser inválido.');
       } else {
         setMessage(data.message || 'Senha redefinida com sucesso! Você já pode fazer login com sua nova senha.');
-        // Optionally redirect to login page after a short delay
         setTimeout(() => {
           router.push('/login');
-        }, 3000); // Redirect after 3 seconds
+        }, 3000);
       }
 
     } catch (err: any) {
@@ -135,7 +119,6 @@ export default function ResetPasswordPage() {
           </div>
         )}
 
-        {/* Only show form if token is valid and no success message */} 
         {token && !message && (
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -183,7 +166,6 @@ export default function ResetPasswordPage() {
           </form>
         )}
 
-        {/* Show link to login if there's an error or no token */} 
         {(error || !token) && !message && (
           <div className="mt-6 text-center text-sm">
             <Link href="/login" className="text-blue-600 hover:text-blue-500">

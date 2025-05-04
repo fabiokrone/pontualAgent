@@ -13,18 +13,18 @@ const nextConfig = {
   trailingSlash: false,
   pageExtensions: ['ts', 'tsx', 'js', 'jsx'],
   
-  // Configuração de proxy com adição da regra de reescrita para a rota dinâmica
+  // Configuração de proxy removendo a regra problemática
   async rewrites() {
     return [
       {
         source: '/api/:path*',
         destination: 'http://app:8000/api/:path*',
-      },
-      // Regra específica para a rota de redefinição de senha
-      {
-        source: '/redefinir-senha/:token',
-        destination: '/redefinir-senha/[token]',
       }
+      // Removida a regra que estava causando o problema:
+      // {
+      //   source: '/redefinir-senha/:token',
+      //   destination: '/redefinir-senha/[token]',
+      // }
     ];
   },
 };
