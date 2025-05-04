@@ -1,0 +1,18 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/favicon.ico/route": "/favicon.ico",
+  "/page": "/",
+  "/esqueci-minha-senha/page": "/esqueci-minha-senha",
+  "/redefinir-senha/page": "/redefinir-senha",
+  "/dashboard/page": "/dashboard",
+  "/dashboard/relatorios/csv/page": "/dashboard/relatorios/csv",
+  "/dashboard/justificativas/page": "/dashboard/justificativas",
+  "/dashboard/batidas/page": "/dashboard/batidas",
+  "/dashboard/relatorios/page": "/dashboard/relatorios",
+  "/dashboard/relatorios/excel/page": "/dashboard/relatorios/excel",
+  "/dashboard/batidas/importar/page": "/dashboard/batidas/importar",
+  "/dashboard/ponto/visualizar/page": "/dashboard/ponto/visualizar",
+  "/dashboard/relatorios/pdf/page": "/dashboard/relatorios/pdf",
+  "/login/page": "/login",
+  "/redefinir-senha/[token]/page": "/redefinir-senha/[token]"
+}

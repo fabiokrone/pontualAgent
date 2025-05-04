@@ -1,0 +1,18 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/page": "app/page.js",
+  "/esqueci-minha-senha/page": "app/esqueci-minha-senha/page.js",
+  "/redefinir-senha/page": "app/redefinir-senha/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/relatorios/csv/page": "app/dashboard/relatorios/csv/page.js",
+  "/dashboard/justificativas/page": "app/dashboard/justificativas/page.js",
+  "/dashboard/batidas/page": "app/dashboard/batidas/page.js",
+  "/dashboard/relatorios/page": "app/dashboard/relatorios/page.js",
+  "/dashboard/relatorios/excel/page": "app/dashboard/relatorios/excel/page.js",
+  "/dashboard/batidas/importar/page": "app/dashboard/batidas/importar/page.js",
+  "/dashboard/ponto/visualizar/page": "app/dashboard/ponto/visualizar/page.js",
+  "/dashboard/relatorios/pdf/page": "app/dashboard/relatorios/pdf/page.js",
+  "/login/page": "app/login/page.js",
+  "/redefinir-senha/[token]/page": "app/redefinir-senha/[token]/page.js"
+}
