@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // Configurações existentes
   eslint: {
     ignoreDuringBuilds: true,
@@ -13,10 +12,6 @@ const nextConfig: NextConfig = {
   // Configurações para melhorar o suporte a rotas dinâmicas
   trailingSlash: false,
   pageExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  
-  // O App Router já é o padrão no Next.js 15+, então não precisamos mais de appDir
-  // Mover serverComponentsExternalPackages para a raiz conforme recomendação dos warnings
-  serverExternalPackages: [],
   
   // Configuração de proxy com adição da regra de reescrita para a rota dinâmica
   async rewrites() {
@@ -34,4 +29,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

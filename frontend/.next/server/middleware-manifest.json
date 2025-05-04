@@ -1,5 +1,7 @@
 {
-  "version": 3,
+  "sortedMiddleware": [
+    "/"
+  ],
   "middleware": {
     "/": {
       "files": [
@@ -10,27 +12,14 @@
       "page": "/",
       "matchers": [
         {
-          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/redefinir-senha(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(\\.json)?[\\/#\\?]?$",
-          "originalSource": "/redefinir-senha/:path*"
-        },
-        {
-          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?(?:\\/((?!api|_next|fonts|images|favicon.ico|logo.png).*))(\\.json)?[\\/#\\?]?$",
-          "originalSource": "/((?!api|_next|fonts|images|favicon.ico|logo.png).*)"
+          "regexp": "^/.*$",
+          "originalSource": "/:path*"
         }
       ],
       "wasm": [],
-      "assets": [],
-      "env": {
-        "__NEXT_BUILD_ID": "p_9v8q49AZrS4HZLmc8Yg",
-        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "aKVQX2RGCebE8yMk4iQgVbbKCrAiQijc6pyICKhjVyg=",
-        "__NEXT_PREVIEW_MODE_ID": "2595a3c878504267e8892dc2113aa936",
-        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "8e726c5dc93d16621f25f0dbe9d9510360c418dd5e118417cd45833cec5d99c3",
-        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "7c3ea9d2487bf633cf5719f85b2ebaba24de96790ff0cea2ecf8c25f10fec55d"
-      }
+      "assets": []
     }
   },
   "functions": {},
-  "sortedMiddleware": [
-    "/"
-  ]
+  "version": 2
 }
