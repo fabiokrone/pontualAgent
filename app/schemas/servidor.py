@@ -159,3 +159,19 @@ class ServidorFilter(BaseModel):
     email: Optional[str] = None
     ativo: Optional[bool] = None
     secretaria_id: Optional[int] = None
+    
+
+class ServidorRead(BaseModel):
+    """Schema para leitura de servidores sem validações rigorosas."""
+    id: int
+    nome: str
+    matricula: str
+    cpf: str
+    email: str
+    ativo: bool
+    secretaria_id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

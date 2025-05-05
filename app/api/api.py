@@ -3,11 +3,16 @@ from fastapi import APIRouter
 from app.api.endpoints import batidas, feriados, justificativas, secretarias, servidores, importacao
 from app.api.endpoints import auth  # Importação explícita
 from app.api.endpoints import logs_auditoria
+from app.api.endpoints import dashboard
+
 
 api_router = APIRouter()
 
 # Primeiro inclua o router de autenticação
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
+
+# Adicionar o router do dashboard
+api_router.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
 
 # Depois os outros routers
 api_router.include_router(batidas.router, prefix="/batidas", tags=["batidas"])

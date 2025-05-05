@@ -24,66 +24,23 @@ export default function LoginPage() {
       return;
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (!apiUrl) {
-        console.error("Erro Crítico: A variável de ambiente NEXT_PUBLIC_API_URL não está definida!");
-        alert("Erro de configuração do sistema. Contate o administrador.");
-        return;
-    }
-    const loginUrl = `${apiUrl}/auth/login`;
-    console.log(`Enviando requisição de login para: ${loginUrl}`);
-
     try {
-      const response = await fetch(loginUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // Corrigido: Enviar 'email' em vez de 'username'
-        body: JSON.stringify({ email, password }),
-      });
-
-      console.log('Status da resposta:', response.status);
-
-      let data;
-      const responseText = await response.text();
-      console.log('Texto da resposta:', responseText);
-
-      try {
-        if (responseText) {
-          data = JSON.parse(responseText);
-        } else {
-           if (!response.ok) throw new Error('Resposta vazia do servidor com erro de status.');
-           data = {};
-        }
-      } catch (error) {
-        console.error('Erro ao processar resposta JSON:', error);
-        throw new Error(`Resposta inválida do servidor (não JSON). Status: ${response.status}. Resposta: ${responseText}`);
-      }
-
-      if (!response.ok) {
-        // Tentar extrair mensagem de erro do Pydantic (pode estar em data.detail[0].msg)
-        let errorMessage = `Erro ao fazer login (Status: ${response.status})`;
-        if (data?.detail && Array.isArray(data.detail) && data.detail[0]?.msg) {
-            errorMessage = data.detail[0].msg;
-        } else if (data?.detail) {
-            errorMessage = data.detail;
-        }
-        throw new Error(errorMessage);
-      }
-
+      // Usar o serviço de autenticação em vez de fetch direto
+      const { authService } = await import('../services/api');
+      const data = await authService.login(email, password);
+      
       if (!data.access_token) {
-          throw new Error("Token de acesso não encontrado na resposta do servidor.");
+        throw new Error("Token de acesso não encontrado na resposta do servidor.");
       }
-
-      // Corrigido: Passar 'email' ou o objeto de usuário retornado
+      
+      // Login bem-sucedido
       login(data.access_token, data.user || { email });
-
+      
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Erro completo durante o login:', err);
       alert(err.message || 'Ocorreu um erro inesperado ao fazer login');
-    }
+    }  
   };
 
   useEffect(() => {

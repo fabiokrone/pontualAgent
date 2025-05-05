@@ -14,11 +14,11 @@ app = FastAPI(
 # Configuração CORS aprimorada
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Lista de origens permitidas
+    allow_origins=settings.CORS_ORIGINS_LIST,  # Usar a propriedade já processada
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
-    expose_headers=["*"],  # Isso pode ajudar em alguns casos
+    expose_headers=["*"],
 )
 
 # Importe a função de seeds

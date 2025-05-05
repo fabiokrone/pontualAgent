@@ -4,7 +4,8 @@ import axios from 'axios';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // Definir a URL base da API - Usando o nome do serviço conforme configurado no Docker Compose
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://app:8000/api';
+// Remover barras duplicadas
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/+$/, '');
 
 
 // Criar uma instância do axios com configurações padrão
@@ -95,9 +96,9 @@ export function useApi() {
 
 // Serviços específicos para cada entidade
 export const authService = {
-  login: async (username: string, password: string) => {
+  login: async (email: string, password: string) => {
     try {
-      const response = await api.post("auth/login", { username, password });
+      const response = await api.post("/api/auth/login", { email, password });
       return response.data;
     } catch (error) {
       throw error;
@@ -117,7 +118,7 @@ export const authService = {
 export const servidoresService = {
   getAll: async (params?: any) => {
     try {
-      const response = await api.get('/servidores', { params });
+      const response = await api.get('/api/servidores', { params });
       return response.data;
     } catch (error) {
       throw error;
@@ -126,7 +127,7 @@ export const servidoresService = {
   
   getById: async (id: number) => {
     try {
-      const response = await api.get(`/servidores/${id}`);
+      const response = await api.get(`/api/servidores/${id}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -250,7 +251,7 @@ export const justificativasService = {
 export const dashboardService = {
   getStats: async () => {
     try {
-      const response = await api.get('/dashboard/stats');
+      const response = await api.get('/api/dashboard/stats');
       return response.data;
     } catch (error) {
       throw error;
@@ -259,7 +260,7 @@ export const dashboardService = {
   
   getRecentActivities: async () => {
     try {
-      const response = await api.get('/dashboard/recent-activities');
+      const response = await api.get('/api/dashboard/recent-activities');
       return response.data;
     } catch (error) {
       throw error;

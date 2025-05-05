@@ -24,14 +24,13 @@ const ServidoresPage = () => {
     const fetchServidores = async () => {
       setLoading(true);
       setError(null);
-      // Determina a URL da API baseada no ambiente (Docker vs. local)
-      // Usar NEXT_PUBLIC_API_DOCKER_URL se disponível (dentro do Docker), senão NEXT_PUBLIC_API_URL
-      const apiUrl = process.env.NEXT_PUBLIC_API_DOCKER_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'; 
       
       try {
-        // Ajuste o endpoint conforme a estrutura da sua API (incluindo /api)
-        const response = await axios.get(`${apiUrl}/api/servidores`); 
-        setServidores(response.data);
+        // Importar e usar o serviço existente
+        const { servidoresService } = await import('../../services/api');
+        const data = await servidoresService.getAll();
+        // Garantir que os dados estejam no formato esperado
+        setServidores(Array.isArray(data) ? data : data.items || []);
       } catch (err) {
         console.error("Erro ao buscar servidores:", err);
         setError('Falha ao carregar os dados dos servidores. Tente novamente mais tarde.');
