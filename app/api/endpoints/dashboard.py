@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import Dict, Any, List
 
 from app.db.session import get_db
@@ -13,14 +14,18 @@ async def get_dashboard_stats(db: Session = Depends(get_db)):
     Retorna estatísticas para o dashboard
     """
     try:
-        # Dados simulados para o dashboard
+        # Contagem real de servidores
+        total_servidores = db.query(func.count(Servidor.id)).scalar() or 0
+        
+        # Mantém os outros valores sintéticos
         return {
-            "total_servidores": 245,
-            "batidas_hoje": 532,
-            "justificativas_pendentes": 18,
-            "dias_irregulares": 37
+            "total_servidores": total_servidores,  # Dado real do banco
+            "batidas_hoje": 532,                  # Valor fixo 
+            "justificativas_pendentes": 18,       # Valor fixo
+            "dias_irregulares": 37                # Valor fixo
         }
     except Exception as e:
+        print(f"Erro ao obter estatísticas do dashboard: {e}")
         raise HTTPException(
             status_code=500, 
             detail="Erro ao obter estatísticas do dashboard."

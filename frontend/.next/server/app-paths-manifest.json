@@ -1,6 +1,7 @@
 {
+  "/esqueci-minha-senha/page": "app/esqueci-minha-senha/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/dashboard/page": "app/dashboard/page.js",
   "/login/page": "app/login/page.js",
-  "/dashboard/servidores/page": "app/dashboard/servidores/page.js"
+  "/dashboard/page": "app/dashboard/page.js",
+  "/redefinir-senha/[token]/page": "app/redefinir-senha/[token]/page.js"
 }

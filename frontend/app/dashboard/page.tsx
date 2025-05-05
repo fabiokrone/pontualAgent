@@ -139,7 +139,7 @@ export default function DashboardPage() {
       
       <div>
         <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-        <p className="text-gray-600">Bem-vindo, {user?.username || 'Usuário'}!</p>
+        <p className="text-gray-600">Bem-vindo, {user?.nome_completo || user?.username || 'Usuário'}!</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

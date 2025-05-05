@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
     }
 
     // Atualizado para usar o endpoint correto que está configurado no backend
-    const recoveryUrl = `${apiUrl}/auth/forgot-password`;
+    const recoveryUrl = `/api/auth/forgot-password`;
     console.log(`Enviando requisição de recuperação para: ${recoveryUrl}`);
 
     try {
