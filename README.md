@@ -32,8 +32,17 @@ O PontoAgent é uma solução completa para gestão de ponto eletrônico, desenv
 
 ## Requisitos
 
-- Docker e Docker Compose
-- Git
+### Requisitos do Sistema
+- Docker 20.10.0 ou superior
+- Docker Compose 2.0.0 ou superior
+- Git 2.0.0 ou superior
+- Mínimo de 2GB de RAM disponível
+- 10GB de espaço em disco
+
+### Requisitos para Desenvolvimento
+- Python 3.9+
+- Node.js 18+ (para desenvolvimento frontend)
+- npm 8+ ou yarn 1.22+
 
 ## Instalação
 
@@ -51,13 +60,61 @@ cp .env.example .env
 
 3. Inicie os containers com Docker Compose:
 ```bash
+# Construir as imagens (primeira vez apenas)
+docker-compose build
+
+# Iniciar os serviços
 docker-compose up -d
+
+# Executar as migrações do banco de dados
+docker-compose exec app alembic upgrade head
+
+# Carregar dados iniciais (opcional)
+docker-compose exec app python -m app.db.seeds
 ```
 
 4. Acesse as interfaces:
 - Backend API: http://localhost:8000/docs
 - Frontend: http://localhost:3000
 - PGAdmin: http://localhost:5050 (login com admin@example.com / admin)
+
+## Desenvolvimento
+
+### Configuração do Ambiente de Desenvolvimento
+
+1. Backend (Python):
+```bash
+# Criar ambiente virtual
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+.\venv\Scripts\activate   # Windows
+
+# Instalar dependências
+pip install -r requirements.txt
+```
+
+2. Frontend (Next.js):
+```bash
+cd frontend
+npm install   # ou yarn install
+```
+
+### Comandos Úteis
+
+```bash
+# Executar testes
+docker-compose exec app pytest
+
+# Verificar logs em tempo real
+docker-compose logs -f
+
+# Reiniciar um serviço específico
+docker-compose restart app  # ou frontend, db, etc.
+
+# Limpar todos os dados e reconstruir
+docker-compose down -v
+docker-compose up -d --build
+```
 
 ## Estrutura do Projeto
 
@@ -122,22 +179,79 @@ Para configurar a integração, preencha as variáveis relacionadas ao WhatsApp 
 
 ### Problemas Comuns
 
-- **Erro de Conexão com o Banco de Dados**: Verifique se as variáveis de ambiente estão configuradas corretamente no arquivo `.env`.
-- **Frontend Não Acessível**: Verifique os logs do container frontend com `docker-compose logs frontend`.
-- **Erro ao Processar Batidas**: Verifique o formato dos arquivos de batida conforme a documentação.
+1. **Erro de Conexão com o Banco de Dados**
+   - Verifique se as variáveis de ambiente no `.env` estão corretas
+   - Confirme se o container do PostgreSQL está rodando: `docker-compose ps`
+   - Verifique os logs do banco: `docker-compose logs db`
 
-### Logs e Diagnóstico
+2. **Frontend Não Acessível**
+   - Verifique se o container está rodando: `docker-compose ps frontend`
+   - Confira os logs: `docker-compose logs frontend`
+   - Verifique se as portas não estão em uso por outros serviços
 
-Para verificar os logs dos serviços:
+3. **Erro ao Processar Batidas**
+   - Verifique o formato dos arquivos de batida (CSV)
+   - Confirme as permissões de escrita nos diretórios de upload
+   - Consulte os logs do serviço: `docker-compose logs app`
+
+4. **Problemas com WhatsApp**
+   - Verifique a conexão com a API do WhatsApp
+   - Confirme as credenciais no arquivo `.env`
+   - Verifique os logs de integração
+
+### Monitoramento e Diagnóstico
 
 ```bash
-# Ver logs de todos os serviços
-docker-compose logs
+# Monitorar uso de recursos
+docker stats
 
-# Ver logs de um serviço específico
-docker-compose logs frontend
-docker-compose logs app
+# Verificar status dos containers
+docker-compose ps
+
+# Inspecionar configurações
+docker-compose config
+
+# Backup do banco de dados
+docker-compose exec db pg_dump -U postgres pontualagent > backup.sql
 ```
+
+## Segurança
+
+### Boas Práticas
+
+1. **Senhas e Credenciais**
+   - Altere todas as senhas padrão após a instalação
+   - Use senhas fortes (mínimo 12 caracteres)
+   - Ative autenticação de dois fatores quando disponível
+
+2. **Ambiente de Produção**
+   - Configure HTTPS usando certificados SSL
+   - Mantenha o sistema e dependências atualizados
+   - Faça backup regular dos dados
+   - Monitore os logs de acesso
+
+3. **Permissões**
+   - Revise periodicamente as permissões dos usuários
+   - Aplique o princípio do menor privilégio
+   - Mantenha registros de auditoria
+
+## Roadmap
+
+### Próximas Funcionalidades
+
+- [ ] Implementação de autenticação biométrica
+- [ ] Integração com sistemas de RH
+- [ ] App mobile para registro de ponto
+- [ ] Dashboard personalizado por departamento
+- [ ] Exportação de relatórios em novos formatos
+- [ ] Módulo de banco de horas avançado
+
+### Em Desenvolvimento
+
+- [ ] Melhorias na interface do usuário
+- [ ] Otimização do processamento de batidas
+- [ ] Novos tipos de relatórios
+- [ ] Integração com calendário corporativo
 
 ## Contribuição
 
