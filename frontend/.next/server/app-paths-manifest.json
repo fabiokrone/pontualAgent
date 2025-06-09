@@ -1,7 +1,4 @@
 {
-  "/not-found": "app/not-found.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/dashboard/servidores/page": "app/dashboard/servidores/page.js",
-  "/dashboard/batidas/page": "app/dashboard/batidas/page.js"
+  "/login/page": "app/login/page.js",
+  "/dashboard/page": "app/dashboard/page.js"
 }
